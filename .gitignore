@@ -1,0 +1,14 @@
+# Environment variables
+.env
+
+# Node.js dependencies
+node_modules
+
+# PHP dependencies
+vendor
+
+# Logs
+*.log
+
+# Cache files
+*.cache

@@ -6,6 +6,12 @@
  * Simple environment loader to read variables from .env file
  */
 function get_env_variable($key, $default = null) {
+    if (isset($_ENV[$key])) {
+        return $_ENV[$key];
+    }
+    if (getenv($key) !== false) {
+        return getenv($key);
+    }
     static $env = null;
     if ($env === null) {
         $env = [];
@@ -36,10 +42,10 @@ function get_env_variable($key, $default = null) {
     return isset($env[$key]) ? $env[$key] : $default;
 }
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$dbname = 'electronicshop';
+$host = get_env_variable('DB_HOST', 'localhost');
+$user = get_env_variable('DB_USER', 'root');
+$pass = get_env_variable('DB_PASS', '');
+$dbname = get_env_variable('DB_NAME', 'electronicshop');
 
 try {
     // 1. Connect to MySQL Server (Without choosing a DB first)
