@@ -91,6 +91,8 @@ The automated pipeline is built using **GitHub Actions** (configured in `.github
 #### 1. Homepage & Responsive Navigation
 ![Home Image](./images/homepage.png)
 
+![CI/CD Proof Screenshot](./images/viewproduct.png)
+
 #### 2. Product Catalog & Category Filtering
 ![Product Catalog Screenshot](./images/addcategory.png)
 
@@ -104,7 +106,7 @@ The automated pipeline is built using **GitHub Actions** (configured in `.github
 ![Docker Proof Screenshot](./images/dashboard.png)
 
 #### 6. GitHub Actions Successful Workflow Execution
-![CI/CD Proof Screenshot](./images/viewproduct.png)
+
 
 ---
 
