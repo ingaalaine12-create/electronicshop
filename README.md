@@ -92,19 +92,19 @@ The automated pipeline is built using **GitHub Actions** (configured in `.github
 ![Home Image](./images/feedback.png)
 
 #### 2. Product Catalog & Category Filtering
-![Product Catalog Screenshot](https://placehold.co)
+![Product Catalog Screenshot](./images/addcategory.png)
 
 #### 3. Shopping Cart & Dynamic Total Calculations
-![Shopping Cart Screenshot](https://placehold.co)
+![Shopping Cart Screenshot](./images/addproduct.png)
 
 #### 4. Checkout Form & Order Confirmation
-![Checkout Screenshot](https://placehold.co)
+![Checkout Screenshot](./images/AdminLogin.png)
 
 #### 5. Docker Build & Execution Proof
-![Docker Proof Screenshot](https://placehold.co)
+![Docker Proof Screenshot](./images/dashboard.png)
 
 #### 6. GitHub Actions Successful Workflow Execution
-![CI/CD Proof Screenshot](https://placehold.co)
+![CI/CD Proof Screenshot](./images/viewproduct.png)
 
 ---
 
