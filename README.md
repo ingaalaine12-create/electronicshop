@@ -89,7 +89,7 @@ The automated pipeline is built using **GitHub Actions** (configured in `.github
 *(Include your working application screenshots below as required for grading)*
 
 #### 1. Homepage & Responsive Navigation
-![Home Image](./images/feedback.png)
+![Home Image](./images/homepage.png)
 
 #### 2. Product Catalog & Category Filtering
 ![Product Catalog Screenshot](./images/addcategory.png)
