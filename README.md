@@ -3,8 +3,8 @@
 [![CI/CD Pipeline](https://github.com)](https://github.com)
 
 ## 🔗 Project Links
-* **Live Deployment URL:** [https://your-deployed-electronishop-link.com](https://your-deployed-electronishop-link.com)
-* **GitHub Repository:** [https://github.com](https://github.com)
+* **Live Deployment URL:**(http://electronicshop.gt.tc/)
+* **GitHub Repository:** (https://github.com/ingaalaine12-create/electronicshop.git)
 
 ---
 
