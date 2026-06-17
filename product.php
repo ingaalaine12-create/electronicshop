@@ -28,6 +28,9 @@ if (!$product) {
     exit();
 }
 
+// Preserve raw product image data so the helper can resolve a file from name or slug when needed
+$productImage = !empty($product['image']) ? $product['image'] : '';
+
 // Decode product specifications
 $specs = json_decode($product['specs'], true);
 if (!is_array($specs)) {
@@ -65,8 +68,8 @@ try {
 
         <div class="detail-grid">
             <!-- Left Column: Product Graphic/Image Panel -->
-            <div class="detail-img-card">
-                <?php echo renderProductImage($product['image'], $product['category_slug'], $product['name'], 'detail-img'); ?>
+            <div class="detail-img-card" style="max-width: 680px; width: 100%;">
+                <?php echo renderProductImage($productImage, $product['category_slug'], $product['name'], 'detail-img', $product['slug']); ?>
             </div>
 
             <!-- Right Column: Product Detail Metadata & Form -->
@@ -192,7 +195,7 @@ try {
                     <!-- Product Card -->
                     <div class="product-card" data-category-slug="<?php echo htmlspecialchars($rel['category_slug']); ?>">
                         <a href="product.php?slug=<?php echo htmlspecialchars($rel['slug']); ?>" style="display: block;">
-                            <?php echo renderProductImage($rel['image'], $rel['category_slug'], $rel['name']); ?>
+                            <?php echo renderProductImage($rel['image'] ?? '', $rel['category_slug'], $rel['name'], 'product-img', $rel['slug']); ?>
                         </a>
 
                         <div class="product-info">

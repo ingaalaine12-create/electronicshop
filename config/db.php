@@ -129,6 +129,17 @@ try {
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;");
 
+    // Suggestions/Feedback Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `suggestions` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `name` VARCHAR(255) NOT NULL,
+        `email` VARCHAR(255) NOT NULL,
+        `subject` VARCHAR(255) NOT NULL,
+        `message` TEXT NOT NULL,
+        `rating` INT DEFAULT NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;");
+
     // 5. Seed Data if tables are empty
     // Seed Admins
     $stmt = $pdo->query("SELECT COUNT(*) FROM `admins`");

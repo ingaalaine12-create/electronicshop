@@ -14,10 +14,28 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 require_once __DIR__ . '/includes/header.php';
 
+// Handle product deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_product') {
+    $productId = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+    
+    if ($productId > 0) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM `products` WHERE `id` = :id");
+            $stmt->execute(['id' => $productId]);
+            $_SESSION['admin_msg'] = "Product deleted successfully!";
+        } catch (PDOException $e) {
+            $_SESSION['admin_err'] = "Failed to delete product: " . $e->getMessage();
+        }
+    }
+    
+    header("Location: admin-products.php");
+    exit();
+}
+
 // Fetch products for list
 try {
-    // Query list of products with category name joins
-    $prodStmt = $pdo->query("SELECT p.*, c.name as category_name 
+    // Query list of products with category name/slug joins
+    $prodStmt = $pdo->query("SELECT p.*, c.name as category_name, c.slug as category_slug 
                              FROM `products` p 
                              LEFT JOIN `categories` c ON p.category_id = c.id 
                              ORDER BY p.id DESC");
@@ -64,16 +82,23 @@ try {
                     <thead>
                         <tr>
                             <th>Product Ref</th>
+                            <th>Picture</th>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Price</th>
                             <th>Stock</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($products as $prod): ?>
                             <tr>
                                 <td><strong>#PROD-<?php echo $prod['id']; ?></strong></td>
+                                <td>
+                                    <div style="max-width: 80px; height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 12px; background: var(--bg-secondary);">
+                                        <?php echo renderProductImage($prod['image'], $prod['category_slug'] ?? 'services', $prod['name'], 'dashboard-product-img', $prod['slug']); ?>
+                                    </div>
+                                </td>
                                 <td><strong><?php echo htmlspecialchars($prod['name']); ?></strong></td>
                                 <td><span style="font-size:12.5px; font-weight:600; color: var(--accent-primary); text-transform: uppercase;"><?php echo htmlspecialchars($prod['category_name']); ?></span></td>
                                 <td><strong><?php echo formatRWF($prod['price']); ?></strong></td>
@@ -81,6 +106,18 @@ try {
                                     <span style="font-weight:700; color: <?php echo ($prod['stock'] > 0) ? 'var(--success)' : 'var(--danger)'; ?>;">
                                         <?php echo $prod['stock']; ?> units
                                     </span>
+                                </td>
+                                <td style="display: flex; gap: 8px;">
+                                    <a href="admin-product-edit.php?id=<?php echo $prod['id']; ?>" class="admin-link-btn" style="padding: 8px 14px; font-size: 13px; flex: 1; text-align: center; border-color: var(--accent-primary); color: var(--accent-primary);">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                    <form action="admin-products.php" method="POST" style="flex: 1;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                        <input type="hidden" name="action" value="delete_product">
+                                        <input type="hidden" name="product_id" value="<?php echo $prod['id']; ?>">
+                                        <button type="submit" class="admin-link-btn" style="padding: 8px 14px; font-size: 13px; width: 100%; border-color: var(--danger); color: var(--danger);">
+                                            <i class="fa-solid fa-trash"></i> Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

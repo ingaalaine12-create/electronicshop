@@ -4,6 +4,41 @@
 
 require_once __DIR__ . '/includes/header.php';
 
+// Handle suggestion form submission
+$suggestionMessage = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'submit_suggestion') {
+    $suggestionName = isset($_POST['suggestion_name']) ? trim($_POST['suggestion_name']) : '';
+    $suggestionEmail = isset($_POST['suggestion_email']) ? trim($_POST['suggestion_email']) : '';
+    $suggestionSubject = isset($_POST['suggestion_subject']) ? trim($_POST['suggestion_subject']) : '';
+    $suggestionMessage = isset($_POST['suggestion_message']) ? trim($_POST['suggestion_message']) : '';
+    $suggestionRating = isset($_POST['suggestion_rating']) ? (int)$_POST['suggestion_rating'] : null;
+
+    if (empty($suggestionName) || empty($suggestionEmail) || empty($suggestionSubject) || empty($suggestionMessage)) {
+        $suggestionError = "All fields are required.";
+    } elseif (!filter_var($suggestionEmail, FILTER_VALIDATE_EMAIL)) {
+        $suggestionError = "Please enter a valid email address.";
+    } else {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO `suggestions` (`name`, `email`, `subject`, `message`, `rating`) VALUES (:name, :email, :subject, :message, :rating)");
+            $stmt->execute([
+                'name' => $suggestionName,
+                'email' => $suggestionEmail,
+                'subject' => $suggestionSubject,
+                'message' => $suggestionMessage,
+                'rating' => $suggestionRating
+            ]);
+            $suggestionSuccess = "Thank you for your suggestion! We appreciate your feedback.";
+            $suggestionName = '';
+            $suggestionEmail = '';
+            $suggestionSubject = '';
+            $suggestionMessage = '';
+            $suggestionRating = null;
+        } catch (PDOException $e) {
+            $suggestionError = "Failed to submit suggestion. Please try again.";
+        }
+    }
+}
+
 // Fetch all categories for filter tabs
 try {
     $catQuery = $pdo->query("SELECT * FROM `categories` ORDER BY `id` ASC");
@@ -164,6 +199,79 @@ try {
             <a href="index.php?cat=services" class="checkout-btn" style="margin-top: 0; padding: 14px 28px; white-space: nowrap;">
                 <i class="fa-solid fa-screwdriver-wrench"></i> Book Service Now
             </a>
+        </div>
+    </div>
+</section>
+
+<!-- User Suggestion Box Section -->
+<section style="padding: 80px 0; background: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+    <div class="container" style="max-width: 700px;">
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h2 style="font-size: 36px; font-weight: 800; margin-bottom: 12px;">
+                Share Your <span style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Feedback</span>
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 15px; max-width: 500px; margin: 0 auto;">
+                We'd love to hear your thoughts, suggestions, and feedback. Help us improve the Kigali TechHub experience.
+            </p>
+        </div>
+
+        <?php if (isset($suggestionSuccess)): ?>
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--border-radius-md); padding: 16px 20px; color: var(--success); margin-bottom: 30px; font-size: 14px;">
+                <i class="fa-solid fa-circle-check"></i> <?php echo $suggestionSuccess; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($suggestionError)): ?>
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--border-radius-md); padding: 16px 20px; color: var(--danger); margin-bottom: 30px; font-size: 14px;">
+                <i class="fa-solid fa-triangle-exclamation"></i> <?php echo $suggestionError; ?>
+            </div>
+        <?php endif; ?>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 40px;">
+            <form action="index.php" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+                <input type="hidden" name="action" value="submit_suggestion">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" name="suggestion_name" class="form-input" placeholder="John Doe" value="<?php echo isset($suggestionName) ? htmlspecialchars($suggestionName) : ''; ?>" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="suggestion_email" class="form-input" placeholder="john@example.com" value="<?php echo isset($suggestionEmail) ? htmlspecialchars($suggestionEmail) : ''; ?>" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Subject</label>
+                    <input type="text" name="suggestion_subject" class="form-input" placeholder="e.g. Product Suggestion, Service Feedback, General Comment" value="<?php echo isset($suggestionSubject) ? htmlspecialchars($suggestionSubject) : ''; ?>" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Your Message</label>
+                    <textarea name="suggestion_message" class="form-textarea" placeholder="Tell us what you think..." style="min-height: 120px;" required><?php echo isset($suggestionMessage) ? htmlspecialchars($suggestionMessage) : ''; ?></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Overall Experience Rating (Optional)</label>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <input type="radio" name="suggestion_rating" value="<?php echo $i; ?>" <?php echo (isset($suggestionRating) && $suggestionRating == $i) ? 'checked' : ''; ?> style="cursor: pointer;">
+                                <span style="font-size: 20px;">
+                                    <?php for ($j = 0; $j < $i; $j++): ?>
+                                        <i class="fa-solid fa-star" style="color: #facc15; margin-right: 2px;"></i>
+                                    <?php endfor; ?>
+                                </span>
+                            </label>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+
+                <button type="submit" class="buy-btn" style="margin-top: 20px; padding: 14px; width: 100%;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Feedback
+                </button>
+            </form>
         </div>
     </div>
 </section>
