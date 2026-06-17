@@ -6,12 +6,68 @@ function formatRWF($amount) {
     return number_format($amount, 0, '.', ',') . ' RWF';
 }
 
-function renderProductImage($imageName, $categorySlug, $productName, $className = 'product-img') {
-    $filePath = __DIR__ . '/../assets/images/' . $imageName;
+function renderProductImage($imageName, $categorySlug, $productName, $className = 'product-img', $productSlug = '') {
+    $imageDir = __DIR__ . '/../assets/images/';
+    $candidateFiles = [];
 
-    // Check if the physical file exists in the directory
-    if (file_exists($filePath) && !is_dir($filePath)) {
-        return '<img src="assets/images/' . htmlspecialchars($imageName) . '" class="' . htmlspecialchars($className) . '" alt="' . htmlspecialchars($productName) . '">';
+    if (!empty($imageName)) {
+        $candidateFiles[] = $imageName;
+    }
+
+    if (!empty($productSlug)) {
+        $safeSlugHyphen = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', $productSlug), '-'));
+        $safeSlugUnderscore = str_replace('-', '_', $safeSlugHyphen);
+        if ($safeSlugHyphen !== '') {
+
+            foreach ([$safeSlugHyphen, $safeSlugUnderscore] as $base) {
+
+                $candidateFiles[] = $base . '.png';
+                $candidateFiles[] = $base . '.jpg';
+                $candidateFiles[] = $base . '.jpeg';
+                $candidateFiles[] = $base . '.webp';
+                $candidateFiles[] = $base . '.gif';
+
+                if (!str_starts_with($base, 'product_')) {
+
+                    $candidateFiles[] = 'product_' . $base . '.png';
+                    $candidateFiles[] = 'product_' . $base . '.jpg';
+                    $candidateFiles[] = 'product_' . $base . '.jpeg';
+                    $candidateFiles[] = 'product_' . $base . '.webp';
+                    $candidateFiles[] = 'product_' . $base . '.gif';
+                    
+                }
+            }
+        }
+    }
+
+    if (!empty($productName)) {
+        $safeNameHyphen = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', $productName), '-'));
+        $safeNameUnderscore = str_replace('-', '_', $safeNameHyphen);
+        if ($safeNameHyphen !== '') {
+            foreach ([$safeNameHyphen, $safeNameUnderscore] as $base) {
+                $candidateFiles[] = $base . '.png';
+                $candidateFiles[] = $base . '.jpg';
+                $candidateFiles[] = $base . '.jpeg';
+                $candidateFiles[] = $base . '.webp';
+                $candidateFiles[] = $base . '.gif';
+                if (!str_starts_with($base, 'product_')) {
+                    $candidateFiles[] = 'product_' . $base . '.png';
+                    $candidateFiles[] = 'product_' . $base . '.jpg';
+                    $candidateFiles[] = 'product_' . $base . '.jpeg';
+                    $candidateFiles[] = 'product_' . $base . '.webp';
+                    $candidateFiles[] = 'product_' . $base . '.gif';
+                }
+            }
+        }
+    }
+
+    $candidateFiles[] = 'product_placeholder.png';
+
+    foreach ($candidateFiles as $candidate) {
+        $filePath = $imageDir . $candidate;
+        if (file_exists($filePath) && !is_dir($filePath)) {
+            return '<img src="assets/images/' . htmlspecialchars($candidate) . '" class="' . htmlspecialchars($className) . '" alt="' . htmlspecialchars($productName) . '" style="width:100%; height:100%; object-fit:cover; display:block;">';
+        }
     }
 
     // Fallback: Return a gorgeous custom dark-glowing tech SVG corresponding to the category
