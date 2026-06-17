@@ -89,7 +89,7 @@ The automated pipeline is built using **GitHub Actions** (configured in `.github
 *(Include your working application screenshots below as required for grading)*
 
 #### 1. Homepage & Responsive Navigation
-![Homepage Screenshot](https://placehold.co)
+![Home Image](assets/images/home.png)
 
 #### 2. Product Catalog & Category Filtering
 ![Product Catalog Screenshot](https://placehold.co)
